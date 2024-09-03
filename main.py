@@ -3,18 +3,30 @@ import logging
 from pathlib import Path
 from connection import connect_to_jdownloader, get_jd_device
 import downloader
+import video_processor
 
 logging.basicConfig(level=logging.INFO)
 
 # Credentials and device information
-email = "xxx"
-password = "xxx"
-device_name = "xxx"
+email = "rami.raghfan@gmail.com"
+password = "!@#QWE123qwe"
+device_name = "JDownloader@RAMI"
 
-# Define the shared directory and ticket directory
-shared_directory = Path("C:/Users/rami.raghfan/Downloads/ingest/shared")
+# Define the base directory for storing downloaded and processed files
+base_directory = Path("C:/Users/rami.raghfan/Downloads/ingest")
+shared_directory = base_directory / "shared"
 ticket_directory = shared_directory / "ticket_directory"
 ticket_directory.mkdir(parents=True, exist_ok=True)
+
+# Intermediate directories
+originals_directory = base_directory / "originals"
+clips_directory = base_directory / "clips"
+final_serve_directory = base_directory / "final_serve"
+
+# Create the intermediate directories
+originals_directory.mkdir(parents=True, exist_ok=True)
+clips_directory.mkdir(parents=True, exist_ok=True)
+final_serve_directory.mkdir(parents=True, exist_ok=True)
 
 # Load ticket data from JSON file
 ticket_file = Path("ticket.json")
@@ -43,9 +55,11 @@ for idx, task in enumerate(ticket_data["Tasks"]):
     task_directory = ticket_directory / f"task_{idx + 1}"
     task_directory.mkdir(parents=True, exist_ok=True)
 
-    downloader.process_task(jd_device, task, idx, task_directory, uuid_mapping)
+    downloader.process_task(jd_device, task, idx, task_directory, uuid_mapping, originals_directory)
 
 api.disconnect()
 logging.info("Disconnected from JDownloader API.")
 
 logging.info(f"UUID Mapping: {json.dumps(uuid_mapping, indent=2)}")
+
+video_processor.process_videos(uuid_mapping, originals_directory, clips_directory, final_serve_directory)

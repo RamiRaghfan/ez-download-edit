@@ -9,6 +9,15 @@
                     ],
                     "Merge": false,
                     "RenameGroup": ""
+                },
+
+                {
+                    "Clips": [
+                        {"Start": "02:00", "End": "03:05"},
+                        {"Start": "03:10", "End": "04:05"}
+                    ],
+                    "Merge": true,
+                    "RenameGroup": ""
                 }
             ],
             "MergeTaskVideos": false,

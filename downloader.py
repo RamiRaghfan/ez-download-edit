@@ -42,7 +42,6 @@ def move_package_to_download_list(jd_device, package_id):
 
 
 def wait_for_all_files(task_directory, expected_count, check_interval=CHECK_INTERVAL, timeout=TIMEOUT):
-    """Wait for the expected number of files to appear in the task directory, checking periodically."""
     logging.info(f"Checking in task directory: {task_directory}")
     start_time = time.time()
     while time.time() - start_time < timeout:
@@ -56,17 +55,42 @@ def wait_for_all_files(task_directory, expected_count, check_interval=CHECK_INTE
     return []
 
 
-def process_task(jd_device, task, idx, task_directory, uuid_mapping):
-    """Process each task to add links and download the videos."""
+def generate_associated_task(task):
+    associated_task = {
+        "downloaded_rename": False,
+        "final_downloaded_filename": "",
+        "video_split_required": True,
+        "clip_groups": []
+    }
+
+    for group_idx, clip_group in enumerate(task["ClipGroups"], start=1):
+        group = {
+            "group_id": group_idx,
+            "clips": [],
+            "merge_required": clip_group["Merge"],
+            "final_filename": clip_group["RenameGroup"] if clip_group["Merge"] else ""
+        }
+
+        for clip_idx, clip in enumerate(clip_group["Clips"], start=1):
+            clip_data = {
+                "clip_id": clip_idx,
+                "start_time": clip["Start"],
+                "end_time": clip["End"],
+                "filename": ""
+            }
+            group["clips"].append(clip_data)
+
+        associated_task["clip_groups"].append(group)
+
+    return associated_task
+
+
+def process_task(jd_device, task, idx, task_directory, uuid_mapping, originals_directory):
     try:
-        # Add links to LinkGrabber
         link_response = add_links_to_linkgrabber(jd_device, task, idx, task_directory)
         logging.info(f"Task {idx + 1}: URL {task['URL']} added to LinkGrabber.")
-
-        # Wait for the package to be processed
         time.sleep(WAIT_TIME)
 
-        # Query the added package in LinkGrabber, filtering by package name
         package_name = f"task_{idx + 1}"
         package_query = jd_device.linkgrabber.query_packages(params=[{
             "packageUUIDs": [],
@@ -81,10 +105,9 @@ def process_task(jd_device, task, idx, task_directory, uuid_mapping):
             "saveTo": True,
             "eta": True,
             "running": True,
-            "name": package_name  # Filter by package name specific to the task
+            "name": package_name
         }])
 
-        # Log the full package query response for debugging
         logging.info(f"Package Query Result: {package_query}")
 
         if not package_query:
@@ -93,23 +116,22 @@ def process_task(jd_device, task, idx, task_directory, uuid_mapping):
 
         for package in package_query:
             package_id = package['uuid']
-
-            # Fetch the links associated with the package UUID
             links_query = query_package_links(jd_device, package_id)
             logging.info(f"Links Query Result for package {package_id}: {links_query}")
 
-            # Filter video links
             video_links = [link for link in links_query if link['name'].lower().endswith(VIDEO_EXTENSIONS)]
             if video_links:
                 move_package_to_download_list(jd_device, package_id)
                 downloaded_files = wait_for_all_files(task_directory, len(video_links))
 
-                # Update the UUID mapping
+                associated_task = generate_associated_task(task)
+
                 uuid_mapping[package_id] = {
                     "link": task["URL"],
                     "title": package["name"],
                     "path": str(task_directory),
-                    "associated_task": task,
+                    "originals_directory": str(originals_directory),
+                    "associated_task": associated_task,
                     "downloaded_files": downloaded_files
                 }
 

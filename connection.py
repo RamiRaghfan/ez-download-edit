@@ -2,7 +2,6 @@ import time
 import logging
 from myjdapi import Myjdapi
 
-# Constants for retry logic
 MAX_RETRIES = 3
 RETRY_DELAY = 5
 

@@ -2,63 +2,85 @@ import os
 import logging
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
-def process_videos(uuid_mapping, originals_directory, clips_directory, final_serve_directory):
-    for uuid, data in uuid_mapping.items():
-        logging.info(f"Processing videos for UUID: {uuid}")
+def process_videos(videos_dict, originals_directory, clips_directory, final_serve_directory):
+    for video_file, video_data in videos_dict.items():
+        logging.info(f"Processing video: {video_file}")
 
-        task_directory = data['path']
-        downloaded_files = data['downloaded_files']
-        associated_task = data['associated_task']
+        associated_tasks = video_data["associated_tasks"]
+        logging.info(f"Associated tasks: {associated_tasks}")
 
-        # Move downloaded files to the originals directory
-        original_files = []
-        for file in downloaded_files:
-            original_file_path = os.path.join(originals_directory, os.path.basename(file))
-            os.rename(os.path.join(task_directory, file), original_file_path)
-            original_files.append(original_file_path)
+        original_file_path = os.path.join(originals_directory, 'ticket', video_file)
 
-        for group in associated_task['clip_groups']:
-            clips = []
-            for clip_data in group['clips']:
-                clip_filename = process_clip(original_files[0], clip_data, clips_directory, uuid, group['group_id'])
-                clip_data['filename'] = clip_filename  # Update the clip data with the actual filename
-                clips.append(clip_filename)
+        if not os.path.exists(original_file_path):
+            logging.error(f"Video file not found: {original_file_path}")
+            continue
 
-            if group['merge_required']:
-                merged_filename = os.path.join(clips_directory, group['final_filename'] or f'merged_output_{uuid}_{group["group_id"]}.mp4')
-                if clips:
-                    merged_clip = concatenate_videoclips([VideoFileClip(clip) for clip in clips])
-                    merged_clip.write_videofile(merged_filename, codec='libx264', audio_codec='aac')
-                    logging.info(f"Merged clips saved to {merged_filename}")
+        # Process each task associated with this video
+        for task_idx, task in enumerate(associated_tasks):
+            for group in task['clip_groups']:
+                clips = []
+                for clip_data in group['clips']:
+                    clip_filename = process_clip(
+                        original_file_path,
+                        clip_data,
+                        clips_directory,
+                        task_idx,
+                        group['group_id'],
+                        os.path.basename(original_file_path)
+                    )
+                    clip_data['filename'] = clip_filename
+                    clips.append(clip_filename)
 
-            # Move the merged file to the final serve directory if needed
-            if group['merge_required']:
-                final_filename = associated_task.get('final_downloaded_filename', f'final_output_{uuid}.mp4')
-                final_filepath = os.path.join(final_serve_directory, final_filename)
-                if os.path.exists(merged_filename):
+                # Merge clips if necessary
+                if group['merge_required']:
+                    merged_filename = os.path.join(
+                        clips_directory,
+                        f"{os.path.splitext(os.path.basename(original_file_path))[0]}_merged_{group['group_id']}.mp4"
+                    )
+                    if clips:
+                        merged_clip = concatenate_videoclips([VideoFileClip(clip) for clip in clips])
+                        merged_clip.write_videofile(merged_filename, codec='libx264', audio_codec='aac')
+                        logging.info(f"Merged clips saved to {merged_filename}")
+
+                    final_filename = f"{os.path.splitext(os.path.basename(merged_filename))[0]}.mp4"
+                    final_filepath = os.path.join(final_serve_directory, final_filename)
+
+                    if os.path.exists(final_filepath):
+                        logging.info(f"File {final_filepath} already exists. Overwriting it.")
+                        os.remove(final_filepath)
+
                     os.rename(merged_filename, final_filepath)
                     logging.info(f"Final merged video saved to {final_filepath}")
 
-def process_clip(video_file, clip_data, clips_directory, uuid, group_id):
+                else:
+                    for clip in clips:
+                        final_clip_path = os.path.join(final_serve_directory, os.path.basename(clip))
+
+                        if os.path.exists(final_clip_path):
+                            logging.info(f"Clip {final_clip_path} already exists. Overwriting it.")
+                            os.remove(final_clip_path)
+
+                        os.rename(clip, final_clip_path)
+                        logging.info(f"Clip moved to {final_clip_path}")
+
+def process_clip(video_file, clip_data, clips_directory, task_idx, group_id, original_filename):
     """Extracts and processes a single clip from the video file."""
     start_time = clip_data['start_time']
     end_time = clip_data['end_time']
 
     clip = VideoFileClip(video_file).subclip(start_time, end_time)
 
-    clip_filename = os.path.join(clips_directory, f"clip_{uuid}_{group_id}_{clip_data['clip_id']}.mp4")
+    # Generate the clip filename based on the original filename
+    clip_filename = os.path.join(
+        clips_directory,
+        f"{os.path.splitext(original_filename)[0]}_clip_{task_idx}_{group_id}_{clip_data['clip_id']}.mp4"
+    )
+
     clip.write_videofile(clip_filename, codec='libx264', audio_codec='aac')
     logging.info(f"Clip saved to {clip_filename}")
 
+    # Close audio reader to avoid WinError
+    if hasattr(clip.audio, 'reader'):
+        clip.audio.reader.close_proc()
+
     return clip_filename
-
-def merge_videos(video_files, output_file):
-    if not video_files:
-        logging.error("No video files to merge. Aborting merge.")
-        return
-    logging.info(f"Merging {len(video_files)} videos into {output_file}")
-
-    clips = [VideoFileClip(video) for video in video_files]
-    final_clip = concatenate_videoclips(clips)
-    final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac')
-    logging.info(f"Saved merged video to {output_file}")

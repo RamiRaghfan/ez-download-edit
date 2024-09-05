@@ -15,7 +15,6 @@ device_name = "xxx"
 base_directory = Path("C:/Users/rami.raghfan/Downloads/ingest")
 shared_directory = base_directory / "shared"
 
-# Intermediate directories
 originals_directory = base_directory / "originals"
 clips_directory = base_directory / "clips"
 final_serve_directory = base_directory / "final_serve"

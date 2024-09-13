@@ -1,57 +1,58 @@
 {
-    "Tasks": [
-        {
-            "URL": "https://www.youtube.com/watch?v=u3FehqOOGMI",
-            "ClipGroups": [
-                {
-                    "Clips": [
-                        {"Start": "00:00", "End": "02:00"}
-                    ],
-                    "Merge": false,
-                    "RenameGroup": ""
-                },
-
-                {
-                    "Clips": [
-                        {"Start": "02:00", "End": "03:05"},
-                        {"Start": "03:10", "End": "04:05"}
-                    ],
-                    "Merge": true,
-                    "RenameGroup": ""
-                }
-            ],
-            "MergeTaskVideos": false,
-            "MoveToLocation": "youtube2"
-        },
-        {
-            "URL": "https://www.youtube.com/watch?v=e32NBwrcKc0",
-            "ClipGroups": [
-                {
-                    "Clips": [
-                        {"Start": "00:00", "End": "02:00"}
-                    ],
-                    "Merge": false,
-                    "RenameGroup": ""
-                }
-            ],
-            "MergeTaskVideos": false,
-            "MoveToLocation": "youtube2"
-        },
-        {
-            "URL": "https://www.youtube.com/watch?v=aYPmlf4d0Z0",
-            "ClipGroups": [
-                {
-                    "Clips": [
-                        {"Start": "00:00", "End": "01:00"}
-                    ],
-                    "Merge": false,
-                    "RenameGroup": ""
-                }
-            ],
-            "MergeTaskVideos": false,
-            "MoveToLocation": "youtube2"
-        }
-    ],
-    "GlobalMergeAll": false,
-    "GlobalMergedTitle": ""
+    "package": {
+        "links": [
+            {
+                "url": "https://www.youtube.com/watch?v=u3FehqOOGMI",
+                "clipGroups": [
+                    {
+                        "clips": [
+                            {"start": "00:00", "end": "02:00"}
+                        ],
+                        "merge": false,
+                        "renameGroup": ""
+                    },
+                    {
+                        "clips": [
+                            {"start": "02:00", "end": "03:05"},
+                            {"start": "03:10", "end": "04:05"}
+                        ],
+                        "merge": true,
+                        "renameGroup": ""
+                    }
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            },
+            {
+                "url": "https://www.youtube.com/watch?v=e32NBwrcKc0",
+                "clipGroups": [
+                    {
+                        "clips": [
+                            {"start": "00:00", "end": "02:00"}
+                        ],
+                        "merge": false,
+                        "renameGroup": ""
+                    }
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            },
+            {
+                "url": "https://www.youtube.com/watch?v=aYPmlf4d0Z0",
+                "clipGroups": [
+                    {
+                        "clips": [
+                            {"start": "00:00", "end": "00:30"}
+                        ],
+                        "merge": false,
+                        "renameGroup": ""
+                    }
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            }
+        ],
+        "globalMergeAll": false,
+        "globalMergedTitle": ""
+    }
 }

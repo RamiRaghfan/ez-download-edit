@@ -23,8 +23,8 @@ Before running the project, make sure you have the following installed and set u
 ## Setup Instructions
 
 1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/yourusername/ez-downloader-editor.git
+   ```bash  
+   git clone https://github.com/RamiRaghfan/ez-downloader-editor.git
    cd ez-downloader-editor
    ```
 

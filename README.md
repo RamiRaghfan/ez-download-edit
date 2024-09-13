@@ -24,8 +24,8 @@ Before running the project, make sure you have the following installed and set u
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/yourrepository.git
-   cd yourrepository
+   git clone https://github.com/yourusername/ez-downloader-editor.git
+   cd ez-downloader-editor
    ```
 
 2. **Create and activate a virtual environment**:

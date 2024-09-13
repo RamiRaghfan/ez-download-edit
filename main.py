@@ -20,7 +20,7 @@ clips_directory.mkdir(parents=True, exist_ok=True)
 final_serve_directory.mkdir(parents=True, exist_ok=True)
 
 try:
-    connect_to_jdownloader()  # Now handled by connection.py
+    connect_to_jdownloader()
 except Exception as e:
     logging.error(f"Failed to connect to JDownloader API: {e}")
     exit(1)
@@ -58,13 +58,13 @@ for json_file in json_directory.glob("*.json"):
     connect_to_jdownloader()
 
     for idx, link in enumerate(links):
-        print("IM ENTERING OOOOOOOOOOOOOOOOOOO")
+        #print("IM ENTERING OOOOOOOOOOOOOOOOOOO")
         downloader.process_task(jd_device, link, idx, ticket_originals_directory, videos_dict)
-        print("STILL INSIDE LOOOP HIIIIIIIIIIIIIIIII")
+       # print("STILL INSIDE LOOOP HIIIIIIIIIIIIIIIII")
 
     disconnect_jdownloader()
 
-    print("Now im OUTSIDE HAHAHAHAHAHAHA")
+    #print("Now im OUTSIDE HAHAHAHAHAHAHA")
 
     video_processor.process_videos(
         videos_dict,

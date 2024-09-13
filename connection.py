@@ -7,9 +7,9 @@ api = Myjdapi()
 jd_device = None
 
 # These are the credentials and device name. You should ideally load them from a secure source or environment variables.
-EMAIL = "rami.raghfan@gmail.com"
-PASSWORD = "!@#QWE123qwe"
-DEVICE_NAME = "JDownloader@RAMI"
+EMAIL = "xxx"
+PASSWORD = "xxx"
+DEVICE_NAME = "xxx"
 
 MAX_RETRIES = 3
 RETRY_DELAY = 5

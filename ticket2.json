@@ -1,0 +1,29 @@
+{
+    "package": {
+        "links": [
+            {
+                "url": "https://www.tiktok.com/@iustinchiroiu/video/7411634756074409248",
+                "clipGroups": [
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            },
+            {
+                "url": "https://www.youtube.com/watch?v=KAHKP313P2I",
+                "clipGroups": [
+                    {
+                        "clips": [
+                            {"start": "00:00", "end": "10:00"}
+                        ],
+                        "merge": false,
+                        "renameGroup": ""
+                    }
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            }
+        ],
+        "globalMergeAll": false,
+        "globalMergedTitle": ""
+    }
+}

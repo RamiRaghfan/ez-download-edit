@@ -1,0 +1,36 @@
+{
+    "package": {
+        "links": [
+            {
+                "url": "https://www.youtube.com/watch?v=IQ3SaSf--8Q",
+                "clipGroups": [
+                    {
+                        "clips": [
+                            {"start": "00:00", "end": "10:00"}
+                        ],
+                        "merge": false,
+                        "renameGroup": ""
+                    }
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            },
+            {
+                "url": "https://www.youtube.com/watch?v=4ASKMcdCc3g",
+                "clipGroups": [
+                    {
+                        "clips": [
+                            {"start": "00:00", "end": "10:00"}
+                        ],
+                        "merge": false,
+                        "renameGroup": ""
+                    }
+                ],
+                "mergeTaskVideos": false,
+                "moveToLocation": "youtube2"
+            }
+        ],
+        "globalMergeAll": false,
+        "globalMergedTitle": ""
+    }
+}

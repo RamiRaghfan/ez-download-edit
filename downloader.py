@@ -1,9 +1,10 @@
 import time
 import logging
 import os
+from myjdapi import MYJDAuthFailedException, MYJDApiException
+import connection
 
-
-WAIT_TIME = 30  # seconds to wait after adding links to LinkGrabber
+WAIT_TIME = 15  # seconds to wait after adding links to LinkGrabber
 CHECK_INTERVAL = 30  # seconds to wait between download completion checks
 TIMEOUT = 1200  # seconds to wait before timing out on download completion
 
@@ -44,9 +45,9 @@ def process_task(jd_device, link, idx, originals_directory, videos_dict):
             links_query = query_package_links(jd_device, package_id)
             logging.info(f"Links Query Result for package {package_id}: {links_query}")
 
-            video_links = [link for link in links_query if link['name'].lower().endswith(VIDEO_EXTENSIONS)]
+            video_links = [link for link in links_query if
+                           link.get('name') and link['name'].lower().endswith(VIDEO_EXTENSIONS)]
             if video_links:
-              #  print("DEBUGGGG: " + str(len(video_links)) + "LINKs:" + str(video_links))
                 move_package_to_download_list(jd_device, package_id)
                 downloaded_files = wait_for_specific_files(originals_directory, video_links)
 
@@ -61,6 +62,14 @@ def process_task(jd_device, link, idx, originals_directory, videos_dict):
 
             else:
                 logging.info(f"Link {idx + 1}: No video links found in the package {package_id}.")
+
+
+    except MYJDAuthFailedException as e:
+        logging.error(f"Authentication failed: {e}. Attempting to reconnect...")
+        connection.connect_to_jdownloader()
+        process_task(jd_device, link, idx, originals_directory, videos_dict)  # Retry after reconnecting
+    except MYJDApiException as e:
+        logging.error(f"API error occurred: {e}")
     except Exception as e:
         logging.error(f"Link {idx + 1}: Failed to process URL {link['url']} - {e}")
 
